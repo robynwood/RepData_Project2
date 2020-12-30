@@ -79,14 +79,7 @@ sortedinjuriesbyEVtypes <- injuriesbyEVtypes[order(-injuriesbyEVtypes$INJURIES),
 
 **- Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?**
 
-I define the most "harmful" event types as those that cause the greatest number overall number of fatalities and injuries.  Based on the sorted total sum of these values, depicted in the tables below, I determined that the following categories were the most harmful with respect to population health:
-- Tornado
-- Thunderstorm Wind
-- Flood
-- Excessive Heat / Heat
-- Lightning
-- Flash Flood
-
+Looking at the sum of the fatalities and injuries by event type (top 10)
 ```{r tables}
 table1 <- as.htmlwidget(formattable(sortedfatalitiesbyEVtypes[1:10,1:2], list('FATALITIES'=color_bar("#FA614B"))))
 table2 <- as.htmlwidget(formattable(sortedinjuriesbyEVtypes[1:10,1:2], list('INJURIES'=color_bar("#B1CBEB"))))
@@ -96,7 +89,9 @@ table2 <- as.htmlwidget(formattable(sortedinjuriesbyEVtypes[1:10,1:2], list('INJ
 table1
 table2
 ```
-The tables above look at the numbers in aggregate and show us the total number of Fatalities and Injuries that occur based on each Event Type.  This shows us that the most harmful categories are Tornado, Excessive Heat, Flash Flood, Lightning, Thunderstorm Winds, and Floods. 
+I measure "harmful" event types by calculating the greatest number overall number of fatalities and injuries.  
+
+The tables above look at the numbers in aggregate and show us the total number of Fatalities and Injuries that occur based on each Event Type.  This shows us that the most harmful categories are Tornado, Excessive Heat/Heat, Flash Flood, Lightning, Thunderstorm Winds, and Floods. 
 
 What about the most extreme values?  I want to look at the boxplots of all Event Types:
 
@@ -130,11 +125,18 @@ plot3+(plot1/plot2)
 ```
 Based on these plots, we can see that the most **extreme** number of injuries come from Ice Storms, Tornadoes, Floods, and Excessive Heat.  The most extreme number of fatalities come from Heat, Excessive Heat, and Tornados.  
 
-Based on this plot, the event types with the most harmful events are Tornado, Hurricane/Typhoon, Ice Storm, Flood, and Heat.
+In conclusion, based on this plot, which looks at the extreme events, and the tables which look at impact overall, the top 6 most harmful event types are:
+
+- Tornado
+- Excessive Heat/Heat
+- Flash Flood
+- Lightning
+- Thunderstorm Winds
+- Floods 
 
 **- Across the United States, which types of events have the greatest economic consequences?**
 
-We will define economic consequences as those events that cost property damage (PROPDMG) and crop damage (CROPDMG).
+We will measure economic consequences by the amount of property damage (PROPDMG) and crop damage (CROPDMG) an event causes.
 
 Aggregate the total number of property damage:
 ```{r}
@@ -188,3 +190,12 @@ plot6+(plot4/plot5)
 ```
 
 Based on these plots, we can see that the most **extreme** economic damage comes from Flash Floods, Floods, High Winds, Landslides, Thunderstorm Winds, and Drought. This is largely based on property damage, as crop damage did not have as many distinct outliers, and had overall lower values.  
+
+
+In conclusion, based on this plot, which looks at the extreme events, and the tables which look at impact overall, the top 6 most harmful event types are:
+- Hail
+- Tornado
+- Flash Flood
+- Flood
+- Thunderstorm Wind
+- Drought
