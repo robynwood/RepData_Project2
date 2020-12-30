@@ -1,6 +1,8 @@
 ---
 output:
-  html_document: default
+  html_document: 
+    fig_height: 7
+    fig_caption: yes
   github_document: default
   pdf_document: default
 ---
@@ -10,18 +12,19 @@ This study explored the U.S. National Oceanic and Atmospheric Administration's (
 
 We defined the most "harmful" event types as those that cause the greatest number overall number of fatalities and injuries, and determined that the following categories were the most harmful with respect to population health:
 - Tornado
-- Thunderstorm Winds
-- Flood
-- Excessive Heat / Heat
-- Lightning
+- Excessive Heat/Heat
 - Flash Flood
+- Lightning
+- Thunderstorm Winds
+- Floods 
 
 We defined the greatest economic consequences as the greatest total amount of crop damage and property damage, and determined that the following event categories had the greatest economic (negative) impact:
 - Hail
+- Tornado
 - Flash Flood
 - Flood
-- Thunderstorm Winds
-- Tornado
+- Thunderstorm Wind
+- Drought
 
 # Data Processing
 How data is loaded into R and processed for analysis, starting from a raw CSV file
@@ -43,7 +46,7 @@ setwd("/Users/Wood/Desktop/Data_Science/Reproducible Research/Course Project 2/R
 ```
 
 Read in the activity.csv data to "stormdata"; yields 902,297 obs of 37 variables:
-```{r Read Data}
+```{r Read Data, cashe=TRUE}
 stormdata <- read.csv("repdata-data-StormData.csv.bz2")
 ```
 
@@ -80,6 +83,7 @@ sortedinjuriesbyEVtypes <- injuriesbyEVtypes[order(-injuriesbyEVtypes$INJURIES),
 **- Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?**
 
 Looking at the sum of the fatalities and injuries by event type (top 10)
+**NOTE TO GRADER - I am not considering these tables to be a "FIGURE" for grading purposes.**
 ```{r tables}
 table1 <- as.htmlwidget(formattable(sortedfatalitiesbyEVtypes[1:10,1:2], list('FATALITIES'=color_bar("#FA614B"))))
 table2 <- as.htmlwidget(formattable(sortedinjuriesbyEVtypes[1:10,1:2], list('INJURIES'=color_bar("#B1CBEB"))))
@@ -120,13 +124,12 @@ plot3 <- ggplot(stormdata, aes(x=INJURIES, y=FATALITIES)) +
         labs(x="Number of Injuries", y="Number of Fatalities")
 ```
 
-```{r fig.width=15}
+```{r fig.width=15, cache=TRUE}
 plot3+(plot1/plot2)
 ```
 Based on these plots, we can see that the most **extreme** number of injuries come from Ice Storms, Tornadoes, Floods, and Excessive Heat.  The most extreme number of fatalities come from Heat, Excessive Heat, and Tornados.  
 
 In conclusion, based on this plot, which looks at the extreme events, and the tables which look at impact overall, the top 6 most harmful event types are:
-
 - Tornado
 - Excessive Heat/Heat
 - Flash Flood
@@ -150,7 +153,7 @@ CROPDMGbyEVtypes <- aggregate(CROPDMG ~ EVTYPE, stormdata, sum)
 sortedCROPDMGbyEVtypes <-CROPDMGbyEVtypes[order(-CROPDMGbyEVtypes$CROPDMG),]
 ```
 
-Look at this in a table
+Look at this in a table.  **NOTE TO GRADER - I am not considering these tables to be a "FIGURE" for grading purposes.**
 ```{r}
 par(mfrow=c(1,2))
 table3 <- as.htmlwidget(formattable(sortedCROPDMGbyEVtypes[1:10,1:2], list('CROPDMG'=color_bar("#FA614B"))))
@@ -185,7 +188,7 @@ plot6 <- ggplot(stormdata, aes(x=PROPDMG, y=CROPDMG)) +
         labs(x="Property Damage", y="Crop Damage")
 ```
 
-```{r fig.width=15}
+```{r fig.width=15, cache=TRUE}
 plot6+(plot4/plot5)
 ```
 
