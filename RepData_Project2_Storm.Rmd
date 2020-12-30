@@ -2,6 +2,7 @@
 output:
   html_document: default
   github_document: default
+  pdf_document: default
 ---
 # Synopsis  
 
@@ -37,39 +38,39 @@ library(patchwork)
 
 **- Load the data (i.e. read.csv())**
 Set working directory to where data and R program lives:
-```{r}
-setwd("/Users/Wood/Desktop/Data_Science/Reproducible Research/Course Project 2/")
+```{r Set Working Directory}
+setwd("/Users/Wood/Desktop/Data_Science/Reproducible Research/Course Project 2/RepData_Project2")
 ```
 
 Read in the activity.csv data to "stormdata"; yields 902,297 obs of 37 variables:
-```{r}
+```{r Read Data}
 stormdata <- read.csv("repdata-data-StormData.csv.bz2")
 ```
 
 **- Process/transform the data (if necessary) into a format suitable for your analysis**
 Looking at the data characteristics:
-```{r}
+```{r str}
 str(stormdata)
 ```
 
 Change the EVTYPE variable in the dataset with to a factor variable.
-```{r}
+```{r evtype_factor}
 stormdata$EVTYPE <- factor(stormdata$EVTYPE)
 ```
 
 What do the factors of EV look like?
-```{r}
+```{r evytpe_summary}
 summary(stormdata$EVTYPE)
 ```
 
 Aggregate the total number of fatalities:
-```{r}
+```{r aggregate_fatalities}
 fatalitiesbyEVtypes <- aggregate(FATALITIES ~ EVTYPE, stormdata, sum)
 sortedfatalitiesbyEVtypes <-fatalitiesbyEVtypes[order(-fatalitiesbyEVtypes$FATALITIES),]
 ```
 
 Aggregate the total number of injuries:
-```{r}
+```{r aggregate_injuries}
 injuriesbyEVtypes <- aggregate(INJURIES ~ EVTYPE, stormdata, sum)
 sortedinjuriesbyEVtypes <- injuriesbyEVtypes[order(-injuriesbyEVtypes$INJURIES),]
 ```
@@ -86,22 +87,26 @@ I define the most "harmful" event types as those that cause the greatest number 
 - Lightning
 - Flash Flood
 
+```{r tables}
+table1 <- as.htmlwidget(formattable(sortedfatalitiesbyEVtypes[1:10,1:2], list('FATALITIES'=color_bar("#FA614B"))))
+table2 <- as.htmlwidget(formattable(sortedinjuriesbyEVtypes[1:10,1:2], list('INJURIES'=color_bar("#B1CBEB"))))
+```
+
 ```{r}
-par(mfrow=c(2,1))
-formattable(sortedfatalitiesbyEVtypes[1:10,1:2], list('FATALITIES'=color_bar("#FA614B")))
-formattable(sortedinjuriesbyEVtypes[1:10,1:2], list('INJURIES'=color_bar("#B1CBEB")))
+table1
+table2
 ```
 The tables above look at the numbers in aggregate and show us the total number of Fatalities and Injuries that occur based on each Event Type.  This shows us that the most harmful categories are Tornado, Excessive Heat, Flash Flood, Lightning, Thunderstorm Winds, and Floods. 
 
 What about the most extreme values?  I want to look at the boxplots of all Event Types:
 
 Subset just the data I'm interested in:
-```{r}
+```{r subset_injuries_fatalities}
 stormdatainjfat <- stormdata[,c(8,23,24)]
 ```
 
 Visualizing this, we look at a scatterplot of events by injuries and fatalities (with the high-impact event types (Injuries > 750 or Fatalities > 100) labeled), on the left; and a boxplot of event injuries and fatalities by event type on the right.
-```{r}
+```{r plots_injuries_fatalities}
 plot1 <- ggplot(subset(stormdatainjfat, EVTYPE %in% c("TORNADO","TSTM WIND","FLOOD","EXCESSIVE HEAT","LIGHTNING","HEAT","ICE STORM","FLASH FLOOD","THUNDERSTORM WIND","HAIL","FLOOD","RIP CURRENT","HIGH WIND","AVALANCHE")), aes(x=EVTYPE, y=INJURIES)) +
    #facet_grid(.~EVTYPE) +
    geom_boxplot(width=0.7) +
@@ -120,10 +125,10 @@ plot3 <- ggplot(stormdata, aes(x=INJURIES, y=FATALITIES)) +
         labs(x="Number of Injuries", y="Number of Fatalities")
 ```
 
-```{r fig.asp=.8, fig.width=15}
+```{r fig.width=15}
 plot3+(plot1/plot2)
 ```
-Based on these plots, we can see that the most extreme number of injuries come from Ice Storms, Tornadoes, Floods, and Excessive Heat.  The most extreme number of fatalities come from Heat, Excessive Heat, and Tornados.  
+Based on these plots, we can see that the most **extreme** number of injuries come from Ice Storms, Tornadoes, Floods, and Excessive Heat.  The most extreme number of fatalities come from Heat, Excessive Heat, and Tornados.  
 
 Based on this plot, the event types with the most harmful events are Tornado, Hurricane/Typhoon, Ice Storm, Flood, and Heat.
 
@@ -146,8 +151,10 @@ sortedCROPDMGbyEVtypes <-CROPDMGbyEVtypes[order(-CROPDMGbyEVtypes$CROPDMG),]
 Look at this in a table
 ```{r}
 par(mfrow=c(1,2))
-formattable(sortedCROPDMGbyEVtypes[1:10,1:2], list('CROPDMG'=color_bar("#FA614B")))
-formattable(sortedPROPDMGbyEVtypes[1:10,1:2], list('PROPDMG'=color_bar("#B1CBEB")))
+table3 <- as.htmlwidget(formattable(sortedCROPDMGbyEVtypes[1:10,1:2], list('CROPDMG'=color_bar("#FA614B"))))
+table4 <- as.htmlwidget(formattable(sortedPROPDMGbyEVtypes[1:10,1:2], list('PROPDMG'=color_bar("#B1CBEB"))))
+table3
+table4
 ```
 The tables above look at the numbers in aggregate; however, what about the most extreme values?  I want to look at the boxplots of all Event Types:
 
@@ -156,27 +163,28 @@ Subset just the data I'm interested in:
 stormdatadmg <- stormdata[,c(8,25,27)]
 ```
 
-Looking at Property Damage only:
+
 ```{r}
-ggplot(subset(stormdatadmg, EVTYPE %in% c("TORNADO","FLASH FLOOD","TSTM WIND","FLOOD","THUNDERSTORM WIND","HAIL","LIGHTNING","THUNDERSTORM WINDS","HIGH WIND","WINTER STORM","FLASH FLOOD","DROUGHT","HEAVY RAIN","LANDSLIDE")), aes(x=EVTYPE, y=PROPDMG)) +
+plot4 <- ggplot(subset(stormdatadmg, EVTYPE %in% c("TORNADO","FLASH FLOOD","TSTM WIND","FLOOD","THUNDERSTORM WIND","HAIL","LIGHTNING","THUNDERSTORM WINDS","HIGH WIND","WINTER STORM","FLASH FLOOD","DROUGHT","HEAVY RAIN","LANDSLIDE")), aes(x=EVTYPE, y=PROPDMG)) +
    #facet_grid(.~EVTYPE) +
    geom_boxplot(width=0.7) +
    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
    xlab("Event Type") + ylab("Property Damage")
-```
 
-Looking at Crop Damage only:
-```{r}
-ggplot(subset(stormdatadmg, EVTYPE %in% c("TORNADO","FLASH FLOOD","TSTM WIND","FLOOD","THUNDERSTORM WIND","HAIL","LIGHTNING","THUNDERSTORM WINDS","HIGH WIND","WINTER STORM","FLASH FLOOD","DROUGHT","HEAVY RAIN","LANDSLIDE")), aes(x=EVTYPE, y=CROPDMG)) +
+plot5 <- ggplot(subset(stormdatadmg, EVTYPE %in% c("TORNADO","FLASH FLOOD","TSTM WIND","FLOOD","THUNDERSTORM WIND","HAIL","LIGHTNING","THUNDERSTORM WINDS","HIGH WIND","WINTER STORM","FLASH FLOOD","DROUGHT","HEAVY RAIN","LANDSLIDE")), aes(x=EVTYPE, y=CROPDMG)) +
    #facet_grid(.~EVTYPE) +
    geom_boxplot(width=0.7) +
    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
    xlab("Event Type") + ylab("Crop Damage")
-```
 
-```{r}
-ggplot(stormdata, aes(x=PROPDMG, y=CROPDMG)) +
+plot6 <- ggplot(stormdata, aes(x=PROPDMG, y=CROPDMG)) +
         geom_point()+
         geom_text_repel(data=filter(stormdata, CROPDMG>900 | PROPDMG>2000), aes(label=EVTYPE)) +
         labs(x="Property Damage", y="Crop Damage")
 ```
+
+```{r fig.width=15}
+plot6+(plot4/plot5)
+```
+
+Based on these plots, we can see that the most **extreme** economic damage comes from Flash Floods, Floods, High Winds, Landslides, Thunderstorm Winds, and Drought. This is largely based on property damage, as crop damage did not have as many distinct outliers, and had overall lower values.  
